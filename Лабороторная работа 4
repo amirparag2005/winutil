@@ -1,0 +1,308 @@
+Задание 1
+using System;
+
+public class MyMatrix
+{
+    private int[,] matrix;
+    private Random random = new Random();
+
+    public MyMatrix(int rows, int cols, int minValue, int maxValue)
+    {
+        matrix = new int[rows, cols];
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                matrix[i, j] = random.Next(minValue, maxValue);
+            }
+        }
+    }
+
+    public int this[int row, int col]
+    {
+        get => matrix[row, col];
+        set => matrix[row, col] = value;
+    }
+
+    public static MyMatrix operator +(MyMatrix a, MyMatrix b)
+    {
+        if (a.matrix.GetLength(0) != b.matrix.GetLength(0) || a.matrix.GetLength(1) != b.matrix.GetLength(1))
+            throw new ArgumentException("Matrices must be of the same size");
+
+        int rows = a.matrix.GetLength(0);
+        int cols = a.matrix.GetLength(1);
+        MyMatrix result = new MyMatrix(rows, cols, 0, 0); // temporary matrix for the result
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = a[i, j] + b[i, j];
+            }
+        }
+        return result;
+    }
+
+    public static MyMatrix operator -(MyMatrix a, MyMatrix b)
+    {
+        if (a.matrix.GetLength(0) != b.matrix.GetLength(0) || a.matrix.GetLength(1) != b.matrix.GetLength(1))
+            throw new ArgumentException("Matrices must be of the same size");
+
+        int rows = a.matrix.GetLength(0);
+        int cols = a.matrix.GetLength(1);
+        MyMatrix result = new MyMatrix(rows, cols, 0, 0);
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = a[i, j] - b[i, j];
+            }
+        }
+        return result;
+    }
+
+    public static MyMatrix operator *(MyMatrix a, int scalar)
+    {
+        int rows = a.matrix.GetLength(0);
+        int cols = a.matrix.GetLength(1);
+        MyMatrix result = new MyMatrix(rows, cols, 0, 0);
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = a[i, j] * scalar;
+            }
+        }
+        return result;
+    }
+
+    public static MyMatrix operator /(MyMatrix a, int scalar)
+    {
+        if (scalar == 0) throw new DivideByZeroException();
+        int rows = a.matrix.GetLength(0);
+        int cols = a.matrix.GetLength(1);
+        MyMatrix result = new MyMatrix(rows, cols, 0, 0);
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = a[i, j] / scalar;
+            }
+        }
+        return result;
+    }
+
+    public void Print()
+    {
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+            for (int j = 0; j < matrix.GetLength(1); j++)
+            {
+                Console.Write(matrix[i, j] + "\t");
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Console.Write("Введите количество строк: ");
+        int rows = int.Parse(Console.ReadLine());
+        Console.Write("Введите количество столбцов: ");
+        int cols = int.Parse(Console.ReadLine());
+        Console.Write("Введите минимальное значение: ");
+        int minValue = int.Parse(Console.ReadLine());
+        Console.Write("Введите максимальное значение: ");
+        int maxValue = int.Parse(Console.ReadLine());
+
+        MyMatrix matrix = new MyMatrix(rows, cols, minValue, maxValue);
+        matrix.Print();
+
+        // Пример операций
+        MyMatrix matrix2 = new MyMatrix(rows, cols, minValue, maxValue);
+        Console.WriteLine("\nВторая матрица:");
+        matrix2.Print();
+
+        MyMatrix sum = matrix + matrix2;
+        Console.WriteLine("\nСумма матриц:");
+        sum.Print();
+    }
+}
+Задание 2
+
+
+```csharp
+using System;
+
+public class Car
+{
+    public string Name { get; set; }
+    public int ProductionYear { get; set; }
+    public int MaxSpeed { get; set; }
+
+    public override string ToString()
+    {
+        return $"Car: {Name}, Year: {ProductionYear}, MaxSpeed: {MaxSpeed}";
+    }
+}
+
+using System;
+using System.Collections.Generic;
+
+public class CarComparer : IComparer<Car>
+{
+    public enum SortBy
+    {
+        Name,
+        ProductionYear,
+        MaxSpeed
+    }
+
+    private SortBy parameter;
+
+    public CarComparer(SortBy parameter)
+    {
+        this.parameter = parameter;
+    }
+
+    public int Compare(Car x, Car y)
+    {
+        return parameter switch
+        {
+            SortBy.Name => x.Name.CompareTo(y.Name),
+            SortBy.ProductionYear => x.ProductionYear.CompareTo(y.ProductionYear),
+            SortBy.MaxSpeed => x.MaxSpeed.CompareTo(y.MaxSpeed),
+            _ => 0
+        };
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Car[] cars = new Car[]
+        {
+            new Car { Name = "Toyota", ProductionYear = 2020, MaxSpeed = 180 },
+            new Car { Name = "Honda", ProductionYear = 2018, MaxSpeed = 190 },
+            new Car { Name = "BMW", ProductionYear = 2019, MaxSpeed = 240 },
+        };
+
+        // Сортировка по названию
+        Array.Sort(cars, new CarComparer(CarComparer.SortBy.Name));
+        Console.WriteLine("Сортировка по названию:");
+        foreach (var car in cars)
+        {
+            Console.WriteLine(car);
+        }
+
+        // Сортировка по году выпуска
+        Array.Sort(cars, new CarComparer(CarComparer.SortBy.ProductionYear));
+        Console.WriteLine("\nСортировка по году выпуска:");
+        foreach (var car in cars)
+        {
+            Console.WriteLine(car);
+        }
+
+        // Сортировка по максимальной скорости
+        Array.Sort(cars, new CarComparer(CarComparer.SortBy.MaxSpeed));
+        Console.WriteLine("\nСортировка по максимальной скорости:");
+        foreach (var car in cars)
+        {
+            Console.WriteLine(car);
+        }
+    }
+}
+Задание 3
+using System;
+using System.Collections;
+
+public class CarCatalog
+{
+    private Car[] cars;
+
+    public CarCatalog(Car[] cars)
+    {
+        this.cars = cars;
+    }
+
+    public IEnumerator GetEnumerator()
+    {
+        foreach (var car in cars)
+        {
+            yield return car;
+        }
+    }
+
+    public IEnumerator GetReverseEnumerator()
+    {
+        for (int i = cars.Length - 1; i >= 0; i--)
+        {
+            yield return cars[i];
+        }
+    }
+
+    public IEnumerator GetCarsByYear(int year)
+    {
+        foreach (var car in cars)
+        {
+            if (car.ProductionYear == year)
+                yield return car;
+        }
+    }
+
+    public IEnumerator GetCarsByMaxSpeed(int maxSpeed)
+    {
+        foreach (var car in cars)
+        {
+            if (car.MaxSpeed >= maxSpeed)
+                yield return car;
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Car[] cars = new Car[]
+        {
+            new Car { Name = "Toyota", ProductionYear = 2020, MaxSpeed = 180 },
+            new Car { Name = "Honda", ProductionYear = 2018, MaxSpeed = 190 },
+            new Car { Name = "BMW", ProductionYear = 2019, MaxSpeed = 240 },
+            new Car { Name = "Mercedes", ProductionYear = 2022, MaxSpeed = 250 }
+        };
+
+        CarCatalog catalog = new CarCatalog(cars);
+
+        Console.WriteLine("Прямой проход:");
+        foreach (var car in catalog)
+        {
+            Console.WriteLine(car);
+        }
+
+        Console.WriteLine("\nОбратный проход:");
+        foreach (var car in catalog.GetReverseEnumerator())
+        {
+            Console.WriteLine(car);
+        }
+
+        Console.WriteLine("\nФильтр по году выпуска (2018):");
+        foreach (var car in catalog.GetCarsByYear(2018))
+        {
+            Console.WriteLine(car);
+        }
+
+        Console.WriteLine("\nФильтр по максимальной скорости (200):");
+        foreach (var car in catalog.GetCarsByMaxSpeed(200))
+        {
+            Console.WriteLine(car);
+        }
+    }
+}
