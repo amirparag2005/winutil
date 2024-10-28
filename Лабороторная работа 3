@@ -1,0 +1,226 @@
+Задание 1
+using System;
+
+public struct Vector
+{
+    public double x;
+    public double y;
+    public double z;
+
+    public Vector(double x, double y, double z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    // Оператор сложения векторов
+    public static Vector operator +(Vector a, Vector b)
+    {
+        return new Vector(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+
+    // Оператор умножения векторов (поэлементно)
+    public static Vector operator *(Vector a, Vector b)
+    {
+        return new Vector(a.x * b.x, a.y * b.y, a.z * b.z);
+    }
+
+    // Оператор умножения вектора на число
+    public static Vector operator *(Vector a, double scalar)
+    {
+        return new Vector(a.x * scalar, a.y * scalar, a.z * scalar);
+    }
+
+    // Логические операторы
+    public static bool operator ==(Vector a, Vector b)
+    {
+        return a.Length() == b.Length();
+    }
+
+    public static bool operator !=(Vector a, Vector b)
+    {
+        return a.Length() != b.Length();
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Vector)
+        {
+            Vector v = (Vector)obj;
+            return this == v;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return Length().GetHashCode();
+    }
+
+    public double Length()
+    {
+        return Math.Sqrt(x * x + y * y + z * z);
+    }
+
+    public override string ToString()
+    {
+        return $"({x}, {y}, {z})";
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Vector v1 = new Vector(1, 2, 3);
+        Vector v2 = new Vector(4, 5, 6);
+        Vector v3 = v1 + v2; // Сложение векторов
+        Vector v4 = v1 * 2; // Умножение вектора на число
+        bool areEqual = v1 == v2; // Логическое сравнение
+
+        Console.WriteLine($"v1: {v1}, v2: {v2}, v3: {v3}, v4: {v4}, areEqual: {areEqual}");
+    }
+}
+Задание 2
+using System;
+using System.Collections.Generic;
+
+public class Car : IEquatable<Car>
+{
+    public string Name { get; set; }
+    public string Engine { get; set; }
+    public int MaxSpeed { get; set; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
+
+    public bool Equals(Car other)
+    {
+        if (other == null) return false;
+        return this.Name == other.Name && this.Engine == other.Engine && this.MaxSpeed == other.MaxSpeed;
+    }
+
+    public override int GetHashCode()
+    {
+        return Name.GetHashCode() ^ Engine.GetHashCode() ^ MaxSpeed.GetHashCode();
+    }
+}
+
+public class CarsCatalog
+{
+    private List<Car> cars = new List<Car>();
+
+    public string this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= cars.Count)
+                throw new IndexOutOfRangeException("Неверный индекс.");
+            return $"{cars[index].Name} ({cars[index].Engine})";
+        }
+    }
+
+    public void AddCar(Car car)
+    {
+        cars.Add(car);
+    }
+
+    public int Count => cars.Count;
+}
+
+class Program
+{
+    static void Main()
+    {
+        CarsCatalog catalog = new CarsCatalog();
+        catalog.AddCar(new Car { Name = "Toyota", Engine = "V6", MaxSpeed = 180 });
+        catalog.AddCar(new Car { Name = "Honda", Engine = "V4", MaxSpeed = 160 });
+
+        for (int i = 0; i < catalog.Count; i++)
+        {
+            Console.WriteLine(catalog[i]); // Выводит название машины и тип двигателя
+        }
+    }
+}
+Задание 3
+using System;
+
+public class Currency
+{
+    public double Value { get; set; }
+
+    public Currency(double value)
+    {
+        Value = value;
+    }
+}
+
+public class CurrencyUSD : Currency
+{
+    public double ExchangeRate { get; set; }
+
+    public CurrencyUSD(double value, double exchangeRate) : base(value)
+    {
+        ExchangeRate = exchangeRate;
+    }
+
+    public static explicit operator CurrencyEUR(CurrencyUSD usd)
+    {
+        return new CurrencyEUR(usd.Value * usd.ExchangeRate);
+    }
+
+    public static explicit operator CurrencyRUB(CurrencyUSD usd)
+    {
+        return new CurrencyRUB(usd.Value * usd.ExchangeRate * 0.75); // например, 0.75 - курс обмена
+    }
+}
+
+public class CurrencyEUR : Currency
+{
+    public double ExchangeRate { get; set; }
+
+    public CurrencyEUR(double value) : base(value) { }
+
+    public static explicit operator CurrencyUSD(CurrencyEUR eur)
+    {
+        return new CurrencyUSD(eur.Value / 0.85); // например, 0.85 - курс обмена
+    }
+
+    public static explicit operator CurrencyRUB(CurrencyEUR eur)
+    {
+        return new CurrencyRUB(eur.Value * 0.75);
+    }
+}
+
+public class CurrencyRUB : Currency
+{
+    public double ExchangeRate { get; set; }
+
+    public CurrencyRUB(double value) : base(value) { }
+
+    public static explicit operator CurrencyUSD(CurrencyRUB rub)
+    {
+        return new CurrencyUSD(rub.Value / 75); // например, 75 - курс обмена
+    }
+
+    public static explicit operator CurrencyEUR(CurrencyRUB rub)
+    {
+        return new CurrencyEUR(rub.Value / 0.75);
+    }
+}
+
+
+class Program
+{
+    static void Main()
+    {
+        CurrencyUSD usd = new CurrencyUSD(100, 0.85);
+        CurrencyEUR eur = (CurrencyEUR)usd; // Преобразование из USD в EUR
+        CurrencyRUB rub = (CurrencyRUB)usd; // Преобразование из USD в RUB
+
+        Console.WriteLine($"USD: {usd.Value}, EUR: {eur.Value}, RUB: {rub.Value}");
+    }
+}
