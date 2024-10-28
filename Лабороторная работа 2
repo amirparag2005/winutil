@@ -1,0 +1,290 @@
+Задание 1
+using System;
+
+public class Pupil
+{
+    public virtual void Study()
+    {
+        Console.WriteLine("Ученик учится.");
+    }
+
+    public virtual void Read()
+    {
+        Console.WriteLine("Ученик читает.");
+    }
+
+    public virtual void Write()
+    {
+        Console.WriteLine("Ученик пишет.");
+    }
+
+    public virtual void Relax()
+    {
+        Console.WriteLine("Ученик отдыхает.");
+    }
+}
+
+public class ExcellentPupil : Pupil
+{
+    public override void Study()
+    {
+        Console.WriteLine("Отличник учится очень усердно.");
+    }
+
+    public override void Read()
+    {
+        Console.WriteLine("Отличник читает много книг.");
+    }
+
+    public override void Write()
+    {
+        Console.WriteLine("Отличник пишет быстро и без ошибок.");
+    }
+
+    public override void Relax()
+    {
+        Console.WriteLine("Отличник отдыхает, не забывая о занятиях.");
+    }
+}
+
+public class GoodPupil : Pupil
+{
+    public override void Study()
+    {
+        Console.WriteLine("Хорошист учится хорошо.");
+    }
+
+    public override void Read()
+    {
+        Console.WriteLine("Хорошист читает несколько книг.");
+    }
+
+    public override void Write()
+    {
+        Console.WriteLine("Хорошист пишет без ошибок, но медленно.");
+    }
+
+    public override void Relax()
+    {
+        Console.WriteLine("Хорошист отдыхает и иногда занимается.");
+    }
+}
+
+public class BadPupil : Pupil
+{
+    public override void Study()
+    {
+        Console.WriteLine("Устойчивый ученик учится плохо.");
+    }
+
+    public override void Read()
+    {
+        Console.WriteLine("Устойчивый ученик редко читает.");
+    }
+
+    public override void Write()
+    {
+        Console.WriteLine("Устойчивый ученик пишет с ошибками.");
+    }
+
+    public override void Relax()
+    {
+        Console.WriteLine("Устойчивый ученик отдыхает без забот.");
+    }
+}
+
+public class ClassRoom
+{
+    private Pupil[] pupils;
+
+    public ClassRoom(params Pupil[] pupils)
+    {
+        this.pupils = new Pupil[4];
+        int count = Math.Min(4, pupils.Length);
+        Array.Copy(pupils, this.pupils, count);
+    }
+
+    public void ShowPupilActivities()
+    {
+        foreach (var pupil in pupils)
+        {
+            pupil?.Study();
+            pupil?.Read();
+            pupil?.Write();
+            pupil?.Relax();
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        ClassRoom classRoom = new ClassRoom(new ExcellentPupil(), new GoodPupil(), new BadPupil());
+        classRoom.ShowPupilActivities();
+    }
+}
+Задание 2
+using System;
+
+public class Vehicle
+{
+    public string Coordinates { get; set; }
+    public decimal Price { get; set; }
+    public int Speed { get; set; }
+    public int Year { get; set; }
+
+    public Vehicle(string coordinates, decimal price, int speed, int year)
+    {
+        Coordinates = coordinates;
+        Price = price;
+        Speed = speed;
+        Year = year;
+    }
+
+    public void ShowInfo()
+    {
+        Console.WriteLine($"Координаты: {Coordinates}, Цена: {Price}, Скорость: {Speed}, Год выпуска: {Year}");
+    }
+}
+
+public class Plane : Vehicle
+{
+    public int Altitude { get; set; }
+    public int PassengerCount { get; set; }
+
+    public Plane(string coordinates, decimal price, int speed, int year, int altitude, int passengerCount)
+        : base(coordinates, price, speed, year)
+    {
+        Altitude = altitude;
+        PassengerCount = passengerCount;
+    }
+
+    public new void ShowInfo()
+    {
+        base.ShowInfo();
+        Console.WriteLine($"Высота: {Altitude}, Количество пассажиров: {PassengerCount}");
+    }
+}
+
+public class Car : Vehicle
+{
+    public int PassengerCount { get; set; }
+
+    public Car(string coordinates, decimal price, int speed, int year, int passengerCount)
+        : base(coordinates, price, speed, year)
+    {
+        PassengerCount = passengerCount;}
+
+    public new void ShowInfo()
+    {
+        base.ShowInfo();
+        Console.WriteLine($"Количество пассажиров: {PassengerCount}");
+    }
+}
+
+public class Ship : Vehicle
+{
+    public int PassengerCount { get; set; }
+    public string HomePort { get; set; }
+
+    public Ship(string coordinates, decimal price, int speed, int year, int passengerCount, string homePort)
+        : base(coordinates, price, speed, year)
+    {
+        PassengerCount = passengerCount;
+        HomePort = homePort;
+    }
+
+    public new void ShowInfo()
+    {
+        base.ShowInfo();
+        Console.WriteLine($"Количество пассажиров: {PassengerCount}, Порт приписки: {HomePort}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Vehicle[] vehicles = new Vehicle[]
+        {
+            new Plane("45.0, 60.0", 1000000, 900, 2020, 10000, 200),
+            new Car("10.0, 20.0", 20000, 150, 2018, 5),
+            new Ship("30.0, 40.0", 500000, 30, 2015, 500, "Гавань")
+        };
+
+        foreach (var vehicle in vehicles)
+        {
+            vehicle.ShowInfo();
+            Console.WriteLine();
+        }
+    }
+}
+Задание 3
+using System;
+
+public class DocumentWorker
+{
+    public virtual void OpenDocument()
+    {
+        Console.WriteLine("Документ открыт.");
+    }
+
+    public virtual void EditDocument()
+    {
+        Console.WriteLine("Редактирование документа доступно в версии Pro.");
+    }
+
+    public virtual void SaveDocument()
+    {
+        Console.WriteLine("Сохранение документа доступно в версии Pro.");
+    }
+}
+
+public class ProDocumentWorker : DocumentWorker
+{
+    public override void EditDocument()
+    {
+        Console.WriteLine("Документ отредактирован.");
+    }
+
+    public override void SaveDocument()
+    {
+        Console.WriteLine("Документ сохранен в старом формате, сохранение в остальных форматах доступно в версии Expert.");
+    }
+}
+
+public class ExpertDocumentWorker : ProDocumentWorker
+{
+    public override void SaveDocument()
+    {
+        Console.WriteLine("Документ сохранен в новом формате.");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Введите ключ доступа (pro или exp):");
+        string accessKey = Console.ReadLine();
+        DocumentWorker docWorker;
+
+        if (accessKey == "pro")
+        {
+            docWorker = new ProDocumentWorker();
+        }
+        else if (accessKey == "exp")
+        {
+            docWorker = new ExpertDocumentWorker();
+        }
+        else
+        {
+            docWorker = new DocumentWorker();
+        }
+
+        docWorker.OpenDocument();
+        docWorker.EditDocument();
+        docWorker.SaveDocument();
+    }
+}
