@@ -1,0 +1,142 @@
+using System;
+using System.Xml.Serialization;
+
+namespace ClassLibrary1
+{
+    [XmlInclude(typeof(Cow))]
+    [XmlInclude(typeof(Lion))]
+    [XmlInclude(typeof(Pig))]
+    [XmlRoot("Animal")]
+    public abstract class Animal
+    {
+        [XmlElement("Country")]
+        public string Country { get; set; }
+
+        [XmlElement("HideFromOtherAnimals")]
+        public bool HideFromOtherAnimals { get; set; }
+
+        [XmlElement("Name")]
+        public string Name { get; set; }
+
+        [XmlElement("WhatAnimal")]
+        public eClassificationAnimal WhatAnimal { get; set; }
+
+        public Animal() { } // Пустой конструктор необходим для сериализации
+
+        public Animal(string country, bool hideFromOtherAnimals, string name, eClassificationAnimal whatAnimal)
+        {
+            Country = country;
+            HideFromOtherAnimals = hideFromOtherAnimals;
+            Name = name;
+            WhatAnimal = whatAnimal;
+        }
+
+        public abstract void SayHello();
+        public abstract eFavouriteFood GetFavouriteFood();
+    }
+
+    public class Cow : Animal
+    {
+        public Cow() : base() { }
+
+        public Cow(string country, bool hideFromOtherAnimals, string name, eClassificationAnimal whatAnimal)
+            : base(country, hideFromOtherAnimals, name, whatAnimal) { }
+
+        public override void SayHello()
+        {
+            Console.WriteLine("Муу!");
+        }
+
+        public override eFavouriteFood GetFavouriteFood()
+        {
+            return eFavouriteFood.Grass;
+        }
+    }
+
+    public class Lion : Animal
+    {
+        public Lion() : base() { }
+
+        public Lion(string country, bool hideFromOtherAnimals, string name, eClassificationAnimal whatAnimal)
+            : base(country, hideFromOtherAnimals, name, whatAnimal) { }
+
+        public override void SayHello()
+        {
+            Console.WriteLine("Рррр!");
+        }
+
+        public override eFavouriteFood GetFavouriteFood()
+        {
+            return eFavouriteFood.Meat;
+        }
+    }
+
+    public class Pig : Animal
+    {
+        public Pig() : base() { }
+        public Pig(string country, bool hideFromOtherAnimals, string name, eClassificationAnimal whatAnimal)
+            : base(country, hideFromOtherAnimals, name, whatAnimal) { }
+
+        public override void SayHello()
+        {
+            Console.WriteLine("Хрю!");
+        }
+
+        public override eFavouriteFood GetFavouriteFood()
+        {
+            return eFavouriteFood.Vegetables;
+        }
+    }
+
+    public enum eClassificationAnimal
+    {
+        Herbivores,
+        Carnivores,
+        Omnivores
+    }
+
+    public enum eFavouriteFood
+    {
+        Grass,
+        Meat,
+        Vegetables
+    }
+}
+
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using ClassLibrary1;
+
+namespace SerializationDemo
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Сначала сериализуем объект
+            Cow cow = new Cow("РОССИЯ", false, "лек", eClassificationAnimal.Herbivores);
+            XmlSerializer serializer = new XmlSerializer(typeof(Cow));
+            using (FileStream fs = new FileStream("animal.xml", FileMode.Create))
+            {
+                serializer.Serialize(fs, cow);
+            }
+            Console.WriteLine("Объект сериализован в animal.xml");
+
+            // Теперь десериализуем объект из файла
+            Cow deserializedCow;
+            using (FileStream fs = new FileStream("animal.xml", FileMode.Open))
+            {
+                deserializedCow = (Cow)serializer.Deserialize(fs);
+            }
+
+            // Выводим информацию о десериализованном объекте
+            Console.WriteLine("Десериализация:");
+            Console.WriteLine($"Страна: {deserializedCow.Country}");
+            Console.WriteLine($"Прятаться от других животных или нет: {(deserializedCow.HideFromOtherAnimals ? "Да" : "Нет")}");
+            Console.WriteLine($"Имя: {deserializedCow.Name}");
+            Console.WriteLine($"Тип животного: {deserializedCow.WhatAnimal}");
+            Console.WriteLine("Десериализация прошла успешно");
+        }
+    }
+}
